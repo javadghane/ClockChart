@@ -1,0 +1,3 @@
+include ':ClockChart'
+include ':app'
+rootProject.name = "TestHourlyChart"
