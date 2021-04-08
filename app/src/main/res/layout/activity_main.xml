@@ -17,13 +17,14 @@
            app:layout_constraintTop_toTopOf="parent" />-->
 
 
-    <ir.javadroid.clockchart.lib.ClockPieView
+    <ir.javadroid.clockchart.lib.ClockChartView
         android:id="@+id/clk"
-        android:layout_width="400dp"
+        android:layout_width="match_parent"
+        app:textColor="@color/black"
+        app:borderColor="@color/black"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_height="400dp"
-        android:layout_gravity="center"
-        android:layout_margin="24dp" />
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
 
 </RelativeLayout>

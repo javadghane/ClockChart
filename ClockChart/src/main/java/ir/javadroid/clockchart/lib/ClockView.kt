@@ -1,6 +1,5 @@
 package ir.javadroid.clockchart.lib
 
-import android.R
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -93,7 +92,7 @@ class ClockView : View {
 
     private fun drawCircle(canvas: Canvas) {
         paint!!.reset()
-        paint!!.color = resources.getColor(R.color.white)
+        paint!!.color = Color.WHITE
         paint!!.strokeWidth = 6f
         paint!!.style = Paint.Style.STROKE
         paint!!.isAntiAlias = true

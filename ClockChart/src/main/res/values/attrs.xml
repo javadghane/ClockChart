@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="clockChart">
+        <attr name="textColor" format="integer" />
+        <attr name="borderColor" format="integer" />
+        <attr name="clockType" format="enum">
+            <enum name="twentyFourHour" value="24" />
+            <enum name="elevenHour" value="12" />
+        </attr>
+    </declare-styleable>
+</resources>

@@ -2,7 +2,6 @@ package ir.javadroid.clockchart.model
 
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Rect
 import ir.javadroid.clockchart.base.ClockChartBase.Companion.defaultAnimationSpeed
 import kotlin.math.abs
 
@@ -11,6 +10,8 @@ class ChartModel {
     var end: Float
     private var targetStart = 0f
     private var targetEnd = 0f
+    var color = 0
+    var chartTitle = ""
 
     companion object {
         public var defaultColor = Color.argb(50, 255, 0, 51)
@@ -21,6 +22,8 @@ class ChartModel {
         end = endDegree
         targetStart = targetPie.start
         targetEnd = targetPie.end
+        color = targetPie.color
+        chartTitle = targetPie.chartTitle
     }
 
     constructor(startHour: Int, startMin: Int, endHour: Int, endMin: Int, color: Int) {
@@ -29,7 +32,7 @@ class ChartModel {
         while (end < start) {
             end += 360f
         }
-        defaultColor = color
+        this.color = color
     }
 
     constructor(startHour: Int, startMin: Int, startSec: Int, endHour: Int, endMin: Int, endSec: Int, color: Int) {
@@ -38,16 +41,28 @@ class ChartModel {
         while (end < start) {
             end += 360f
         }
-        defaultColor = color
+        this.color = color
     }
 
+    /*fun getColorNoTransparent(): Int {
+        val colorHex = java.lang.String.format("#%06X", 0xFFFFFF and color)
+        return color or -0x1000000
+    }*/
+
     fun setColor(color: Int): ChartModel {
-        defaultColor = color
+        this.color = color
+        return this
+    }
+
+    fun setTitle(title: String): ChartModel {
+        this.chartTitle = title
         return this
     }
 
     fun getColorPaint(): Paint {
-        return Paint().apply { color = defaultColor }
+        val paint = Paint()
+        paint.color = color
+        return paint
     }
 
     fun setTarget(targetStart: Float, targetEnd: Float): ChartModel {
@@ -65,8 +80,8 @@ class ChartModel {
     val isAtRest: Boolean get() = start == targetStart && end == targetEnd
 
     fun update() {
-        start = updateSelf(start, targetStart, defaultAnimationSpeed)
-        end = updateSelf(end, targetEnd, defaultAnimationSpeed)
+        start = targetStart //updateSelf(start, targetStart, defaultAnimationSpeed)
+        end = targetEnd //updateSelf(end, targetEnd, defaultAnimationSpeed)
     }
 
     val sweep: Float get() = end - start

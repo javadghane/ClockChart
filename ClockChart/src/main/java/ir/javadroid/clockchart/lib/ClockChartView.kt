@@ -4,12 +4,17 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import ir.javadroid.clockchart.R
 import ir.javadroid.clockchart.base.ClockChartBase
 import ir.javadroid.clockchart.model.ChartModel
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-class ClockPieView constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
+
+class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
+
+
     private val textPaint: Paint = Paint()
     private val linePaint: Paint
     private val whitePaint: Paint
@@ -31,16 +36,19 @@ class ClockPieView constructor(context: Context, attrs: AttributeSet? = null) : 
     private val animator: Runnable by lazy {
         object : Runnable {
             override fun run() {
-                var needNewFrame = false
+                // var needNewFrame = false
                 for (pie in chartLists) {
                     pie.update()
-                    if (!pie.isAtRest) {
-                        needNewFrame = true
-                    }
+                    // if (!pie.isAtRest) {
+                    //  needNewFrame = true
+                    //  }
                 }
-                if (needNewFrame) {
-                    postDelayed(this, 5)
-                }
+                //  if (needNewFrame) {
+                //if (ClockChartBase.defaultAnimationSpeed == 1)
+                //  post(this)
+                //else
+                // postDelayed(this, 5)
+                // }
                 invalidate()
             }
         }
@@ -66,26 +74,90 @@ class ClockPieView constructor(context: Context, attrs: AttributeSet? = null) : 
         }
         removeCallbacks(animator)
         post(animator)
-
-
     }
 
     override fun onDraw(canvas: Canvas) {
 
         drawBackground(canvas)
+
         for (chart in chartLists) {
+
+
+            val txtPaint = Paint().apply {
+                color = chart.color or -0x1000000
+                textSize = 40f
+            }
+
             canvas.drawArc(cirRect, chart.start, chart.sweep, true, chart.getColorPaint())
+            ClockChartBase.log("start:" + chart.start + "-" + chart.sweep)
+
+            val centerAngle = (chart.sweep / 2 + chart.start).toDouble()
+
+            val startX: Double = cos(Math.toRadians(centerAngle)) * pieRadius + cirRect.centerX()
+            val startY: Double = sin(Math.toRadians(centerAngle)) * pieRadius + cirRect.centerY()
+
+
+
+            var dx = 0
+            var dy = 0
+            when (centerAngle) {
+                //1
+                in 0.toDouble()..90.toDouble() -> {
+                    dx = +30
+                    dy = -10
+                }
+                in 360.toDouble()..450.toDouble() -> {
+                    dx = +30
+                    dy = -10
+                }
+
+                //2
+                in 90.toDouble()..180.toDouble() -> {
+                    dx = -30
+                    dy = +100
+                }
+                in 450.toDouble()..540.toDouble() -> {
+                    dx = -30
+                    dy = +100
+                }
+
+                //3
+                in 180.toDouble()..270.toDouble() -> {
+                    dx = -150
+                    dy = +30
+                }
+                in 540.toDouble()..630.toDouble() -> {
+                    dx = -150
+                    dy = +30
+                }
+
+                //4
+                in 270.toDouble()..360.toDouble() -> {
+                    dx = +50
+                    dy = +20
+                }
+                in 630.toDouble()..720.toDouble() -> {
+                    dx = +50
+                    dy = +20
+                }
+            }
+            canvas.drawText(chart.chartTitle, startX.toFloat()+dx , startY.toFloat()+dy , txtPaint)
+
+
         }
     }
 
 
     private fun drawBackground(canvas: Canvas) {
 
-        for (i in 0..11) {
-            tempPointLeft[pieCenterPoint.x - (sin(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()] = pieCenterPoint.y - (cos(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()
-            tempPointRight[pieCenterPoint.x + (sin(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()] = pieCenterPoint.y + (cos(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()
-            canvas.drawLine(tempPointLeft.x.toFloat(), tempPointLeft.y.toFloat(), tempPointRight.x.toFloat(), tempPointRight.y.toFloat(), linePaint)
+        if (ClockChartBase.isShowClockHandler) {
+            for (i in 0..11) {
+                tempPointLeft[pieCenterPoint.x - (sin(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()] = pieCenterPoint.y - (cos(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()
+                tempPointRight[pieCenterPoint.x + (sin(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()] = pieCenterPoint.y + (cos(Math.PI / 12 * i) * (pieRadius + lineLength)).toInt()
+                canvas.drawLine(tempPointLeft.x.toFloat(), tempPointLeft.y.toFloat(), tempPointRight.x.toFloat(), tempPointRight.y.toFloat(), linePaint)
+            }
         }
+
 
         canvas.drawCircle(pieCenterPoint.x.toFloat(), pieCenterPoint.y.toFloat(), pieRadius + lineLength / 2.toFloat(), whitePaint)
         canvas.drawCircle(pieCenterPoint.x.toFloat(), pieCenterPoint.y.toFloat(), pieRadius + lineThickness.toFloat(), linePaint)
@@ -135,9 +207,16 @@ class ClockPieView constructor(context: Context, attrs: AttributeSet? = null) : 
     }
 
     init {
+        val a = context.theme.obtainStyledAttributes(attrs, R.styleable.clockChart, 0, 0)
+        val borderColor = a.getInteger(R.styleable.clockChart_borderColor, 0);
+        val textColor = a.getInteger(R.styleable.clockChart_textColor, 0);
+        a.recycle()
+
+        ClockChartBase.changeBorderColor(borderColor)
+        ClockChartBase.changeTextColor(textColor)
+
         textPaint.isAntiAlias = true
-        val textColor = Color.parseColor("#9B9A9B")
-        textPaint.color = textColor
+        textPaint.color = ClockChartBase.defaultTextColor
         textPaint.textSize = textSize.toFloat()
         textPaint.textAlign = Paint.Align.CENTER
         val fm = Paint.FontMetrics()
@@ -146,7 +225,7 @@ class ClockPieView constructor(context: Context, attrs: AttributeSet? = null) : 
         textPaint.getTextBounds("18", 0, 1, textRect)
 
         linePaint = Paint(textPaint)
-        val grayColor = Color.parseColor("#D4D3D4")
+        val grayColor = ClockChartBase.defaultBorderColor
         linePaint.color = grayColor
         linePaint.strokeWidth = lineThickness.toFloat()
         whitePaint = Paint(linePaint)
