@@ -1,5 +1,6 @@
 package ir.javadroid.clockchart.lib
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -7,7 +8,6 @@ import android.view.View
 import ir.javadroid.clockchart.R
 import ir.javadroid.clockchart.base.ClockChartBase
 import ir.javadroid.clockchart.model.ChartModel
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -34,23 +34,11 @@ class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) 
     private val textRect: Rect
     private val chartLists: ArrayList<ChartModel> = ArrayList()
     private val animator: Runnable by lazy {
-        object : Runnable {
-            override fun run() {
-                // var needNewFrame = false
-                for (pie in chartLists) {
-                    pie.update()
-                    // if (!pie.isAtRest) {
-                    //  needNewFrame = true
-                    //  }
-                }
-                //  if (needNewFrame) {
-                //if (ClockChartBase.defaultAnimationSpeed == 1)
-                //  post(this)
-                //else
-                // postDelayed(this, 5)
-                // }
-                invalidate()
+        Runnable {
+            for (pie in chartLists) {
+                pie.update()
             }
+            invalidate()
         }
     }
 
@@ -59,7 +47,6 @@ class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) 
             val pieSize = if (chartLists.isEmpty()) 0 else chartLists.size
             for (i in helperList.indices) {
                 if (i > pieSize - 1) {
-                    //float mStart = helperList.get(i).getStart();
                     chartLists.add(ChartModel(0f, 0f, helperList[i]))
                 } else {
                     chartLists[i] = chartLists[i].setTarget(helperList[i])
@@ -76,20 +63,22 @@ class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) 
         post(animator)
     }
 
+    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
-
         drawBackground(canvas)
-
         for (chart in chartLists) {
-
-
             val txtPaint = Paint().apply {
                 color = chart.color or -0x1000000
                 textSize = 40f
             }
 
-            canvas.drawArc(cirRect, chart.start, chart.sweep, true, chart.getColorPaint())
-            ClockChartBase.log("start:" + chart.start + "-" + chart.sweep)
+            //if(ClockChartBase.isTwentyFourHours){
+                canvas.drawArc(cirRect, chart.start, chart.sweep, true, chart.getColorPaint())
+          //  }else{
+               // canvas.drawArc(cirRect, chart.start*2, chart.sweep*2, true, chart.getColorPaint())
+           // }
+
+
 
             val centerAngle = (chart.sweep / 2 + chart.start).toDouble()
 
@@ -97,51 +86,79 @@ class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) 
             val startY: Double = sin(Math.toRadians(centerAngle)) * pieRadius + cirRect.centerY()
 
 
+            var dx = 0f
+            var dy = 0f
 
-            var dx = 0
-            var dy = 0
+
+            val textBounds = Rect()
+            txtPaint.getTextBounds(chart.chartTitle, 0, chart.chartTitle.length, textBounds)
+
+
+            val dxDefault = textBounds.exactCenterX()
+            val dyDefault = textBounds.exactCenterY()
+
+            ClockChartBase.log(centerAngle.toString())
+
             when (centerAngle) {
                 //1
-                in 0.toDouble()..90.toDouble() -> {
-                    dx = +30
-                    dy = -10
+                in 360.toDouble()..405.toDouble() -> {
+                    dx = 20f
+                    dy = 10f
+                    ClockChartBase.log(chart.chartTitle + ":1:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
-                in 360.toDouble()..450.toDouble() -> {
-                    dx = +30
-                    dy = -10
+                in 405.toDouble()..450.toDouble() -> {
+                    dx = 0f
+                    dy = 30f
+                    ClockChartBase.log(chart.chartTitle + ":1:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
 
                 //2
-                in 90.toDouble()..180.toDouble() -> {
-                    dx = -30
-                    dy = +100
+                in 450.toDouble()..495.toDouble() -> {
+                    dx = -(textPaint.measureText(chart.chartTitle) / 2)
+                    dy = 60f
+
+                    ClockChartBase.log(chart.chartTitle + ":2:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
-                in 450.toDouble()..540.toDouble() -> {
-                    dx = -30
-                    dy = +100
+                in 495.toDouble()..540.toDouble() -> {
+                    dx = -(textPaint.measureText(chart.chartTitle) + 15)
+                    dy = 15f
+                    ClockChartBase.log(chart.chartTitle + ":2:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
 
                 //3
-                in 180.toDouble()..270.toDouble() -> {
-                    dx = -150
-                    dy = +30
+
+                in 540.toDouble()..585.toDouble() -> {
+                    dx = -(textPaint.measureText(chart.chartTitle) + 15)
+                    dy = 15f
+                    ClockChartBase.log(chart.chartTitle + ":3:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
-                in 540.toDouble()..630.toDouble() -> {
-                    dx = -150
-                    dy = +30
+                in 585.toDouble()..630.toDouble() -> {
+                    dx = -(textPaint.measureText(chart.chartTitle) - 15)
+                    dy = -15f
+                    ClockChartBase.log(chart.chartTitle + ":3:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
 
                 //4
-                in 270.toDouble()..360.toDouble() -> {
-                    dx = +50
-                    dy = +20
+
+                in 270.toDouble()..315.toDouble() -> {
+                    dx = -25f
+                    dy = -10f
+                    ClockChartBase.log(chart.chartTitle + ":4:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
-                in 630.toDouble()..720.toDouble() -> {
-                    dx = +50
-                    dy = +20
+                in 315.toDouble()..360.toDouble() -> {
+                    dx = 10f
+                    dy = 25f
+                    ClockChartBase.log(chart.chartTitle + ":4:" + centerAngle + "x:" + dx + " y:" + dy)
                 }
             }
-            canvas.drawText(chart.chartTitle, startX.toFloat()+dx , startY.toFloat()+dy , txtPaint)
+
+
+            val x = startX.toFloat() + dx
+            val y = startY.toFloat() + dy
+            canvas.save()
+            //canvas.rotate(dz, x, y)
+            canvas.drawText(chart.chartTitle, x, y, txtPaint)
+            canvas.restore()
 
 
         }
@@ -164,10 +181,19 @@ class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) 
         canvas.drawCircle(pieCenterPoint.x.toFloat(), pieCenterPoint.y.toFloat(), pieRadius.toFloat(), whitePaint)
 
         val clockNumber: ArrayList<String> = arrayListOf("11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "24", "23", "22", "21", "20", "19", "18", "17", "16", "15", "14", "13", "12")
-        for (i in 24 downTo 1) {
-            tempPointRight[pieCenterPoint.x + (sin(Math.PI / 12 * i) * (pieRadius - lineLength)).toInt()] = pieCenterPoint.y + (cos(Math.PI / 12 * i) * (pieRadius - lineLength)).toInt()
-            canvas.drawText(clockNumber[i - 1], tempPointRight.x.toFloat(), tempPointRight.y.toFloat() + 15, textPaint)
+        val clockNumberHalf: ArrayList<String> = arrayListOf("6", "5", "4", "3", "2", "1", "12", "11", "10", "9", "8", "7")
+        if (ClockChartBase.isTwentyFourHours) {
+            for (i in 24 downTo 1) {
+                tempPointRight[pieCenterPoint.x + (sin(Math.PI / 12 * i) * (pieRadius - lineLength)).toInt()] = pieCenterPoint.y + (cos(Math.PI / 12 * i) * (pieRadius - lineLength)).toInt()
+                canvas.drawText(clockNumber[i - 1], tempPointRight.x.toFloat(), tempPointRight.y.toFloat() + 15, textPaint)
+            }
+        } else {
+            for ((j, i) in (0..23 step 2).withIndex()) {
+                tempPointRight[pieCenterPoint.x + (sin(Math.PI / 12 * i) * (pieRadius - lineLength)).toInt()] = pieCenterPoint.y + (cos(Math.PI / 12 * i) * (pieRadius - lineLength)).toInt()
+                canvas.drawText(clockNumberHalf[j], tempPointRight.x.toFloat(), tempPointRight.y.toFloat() + 15, textPaint)
+            }
         }
+
 
         // canvas.drawText("0", pieCenterPoint.x, topTextHeight, textPaint);
         // canvas.drawText("12", pieCenterPoint.x, mViewHeight, textPaint);
@@ -178,7 +204,7 @@ class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         mViewWidth = measureWidth(widthMeasureSpec)
         mViewHeight = measureHeight(heightMeasureSpec)
-        pieRadius = mViewWidth / 2 - lineLength * 2 - (textPaint.measureText("18") / 2).toInt()
+        pieRadius = mViewWidth / 2 - lineLength * 2 - (textPaint.measureText("12") / 2).toInt() - textPaint.measureText("2424").toInt()
         pieCenterPoint[mViewWidth / 2 - rightTextWidth.toInt() / 2 + leftTextWidth.toInt() / 2] = mViewHeight / 2 + textSize / 2 - (textPaint.measureText("18") / 2).toInt()
         cirRect[(pieCenterPoint.x - pieRadius).toFloat(), (
                 pieCenterPoint.y - pieRadius).toFloat(), (
@@ -208,12 +234,13 @@ class ClockChartView constructor(context: Context, attrs: AttributeSet? = null) 
 
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.clockChart, 0, 0)
-        val borderColor = a.getInteger(R.styleable.clockChart_borderColor, 0);
-        val textColor = a.getInteger(R.styleable.clockChart_textColor, 0);
+        val borderColor = a.getInteger(R.styleable.clockChart_borderColor, 0)
+        val textColor = a.getInteger(R.styleable.clockChart_textColor, 0)
         a.recycle()
 
         ClockChartBase.changeBorderColor(borderColor)
         ClockChartBase.changeTextColor(textColor)
+
 
         textPaint.isAntiAlias = true
         textPaint.color = ClockChartBase.defaultTextColor

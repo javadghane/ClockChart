@@ -16,27 +16,43 @@ class MainActivity : AppCompatActivity() {
         val clock: ClockChartView = findViewById(R.id.clk)
 
 
-        //ClockChartBase.changeAnimationSpeed(10)
+
         ClockChartBase.changeBorderColor(Color.BLACK)
         ClockChartBase.changeTextColor(Color.RED)
         ClockChartBase.showingClockHandler(false)
 
-        set(clock)
+
+       // set24Hours(clock)
+
+
+        set12Hours(clock)
     }
 
 
-    private fun set(clockPieView: ClockChartView) {
-        val charts = ArrayList<ChartModel>()
-        /*  charts.add(ChartModel(15, 30, 22, 30, Color.parseColor("#3343D7E4")).setTitle("salam"))
-          charts.add(ChartModel(21, 50, 6, 30, Color.parseColor("#44FAFF2E")).setTitle("123"))
-          charts.add(ChartModel(8, 50, 10, 30, Color.parseColor("#44FA002E")).setTitle("qqq"))
-          charts.add(ChartModel(11, 50, 14, 30, Color.parseColor("#33FA8D2E")).setTitle("zx"))*/
+    private fun set12Hours(clockPieView: ClockChartView) {
+        ClockChartBase.isTwentyFourHours = false
 
-        //charts.add(ChartModel(10, 1, 18, 0, Color.parseColor("#3343D7E4")).setTitle("10-18"))
-        charts.add(ChartModel(5, 0, 10, 0, Color.parseColor("#3343D7E4")).setTitle("star"))
-        charts.add(ChartModel(19, 0, 23, 0, Color.parseColor("#44FAFF2E")).setTitle("1923"))
-        charts.add(ChartModel(1, 0, 4, 0, Color.parseColor("#44FA00ff")).setTitle("1040"))
-        charts.add(ChartModel(11, 0, 18, 0, Color.parseColor("#33FA8D2E")).setTitle("11020"))
+        val charts = ArrayList<ChartModel>()
+        charts.add(ChartModel(4, 30, 6, 0, Color.parseColor("#A321E10C")).setTitle("13:30")) //4-6
+        charts.add(ChartModel(9, 30, 12, 0, Color.parseColor("#3343D7E4")).setTitle("13:30")) //4-6
+        clockPieView.setDate(charts)
+    }
+
+    private fun set24Hours(clockPieView: ClockChartView) {
+        ClockChartBase.isTwentyFourHours = true
+
+        val charts = ArrayList<ChartModel>()
+        charts.add(ChartModel(1, 0, 2, 0, Color.parseColor("#A321E10C")).setTitle("13:30"))
+        charts.add(ChartModel(3, 0, 6, 0, Color.parseColor("#A321E10C")).setTitle("13:30"))
+
+        charts.add(ChartModel(7, 0, 9, 0, Color.parseColor("#3343D7E4")).setTitle("13:30"))
+        charts.add(ChartModel(10, 0, 11, 0, Color.parseColor("#3343D7E4")).setTitle("xcn12"))
+
+        charts.add(ChartModel(13, 0, 15, 0, Color.parseColor("#44FA002E")).setTitle("xcn21"))
+        charts.add(ChartModel(16, 0, 17, 0, Color.parseColor("#44FA002E")).setTitle("xcn22"))
+
+        charts.add(ChartModel(19, 45, 21, 0, Color.parseColor("#33FA8D2E")).setTitle("xcn31"))
+        charts.add(ChartModel(21, 45, 24, 0, Color.parseColor("#33FA8D2E")).setTitle("xcn32"))
 
         clockPieView.setDate(charts)
     }

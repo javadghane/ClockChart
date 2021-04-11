@@ -2,7 +2,7 @@ package ir.javadroid.clockchart.model
 
 import android.graphics.Color
 import android.graphics.Paint
-import ir.javadroid.clockchart.base.ClockChartBase.Companion.defaultAnimationSpeed
+import ir.javadroid.clockchart.base.ClockChartBase
 import kotlin.math.abs
 
 class ChartModel {
@@ -27,8 +27,11 @@ class ChartModel {
     }
 
     constructor(startHour: Int, startMin: Int, endHour: Int, endMin: Int, color: Int) {
-        start = (270 + startHour * 15 + startMin * 15 / 60).toFloat()
-        end = (270 + endHour * 15 + endMin * 15 / 60).toFloat()
+        val anglePerMinute = if (ClockChartBase.isTwentyFourHours) 15 else 30
+
+        start = (270 + startHour * anglePerMinute + startMin * anglePerMinute / 60).toFloat()
+        end = (270 + endHour * anglePerMinute + endMin * anglePerMinute / 60).toFloat()
+
         while (end < start) {
             end += 360f
         }

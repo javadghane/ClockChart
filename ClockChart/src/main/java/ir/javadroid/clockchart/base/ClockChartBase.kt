@@ -7,14 +7,10 @@ class ClockChartBase {
 
 
     companion object {
-        public var defaultAnimationSpeed = 50
         public var defaultTextColor = Color.parseColor("#D4D3D4")
         public var defaultBorderColor = Color.parseColor("#9B9A9B")
         public var isShowClockHandler = true
-
-        fun changeAnimationSpeed(speedValue: Int) {
-            defaultAnimationSpeed = speedValue
-        }
+        public var isTwentyFourHours = true
 
         fun changeTextColor(color: Int) {
             defaultTextColor = color
@@ -23,7 +19,8 @@ class ClockChartBase {
         fun changeBorderColor(color: Int) {
             defaultBorderColor = color
         }
-        fun showingClockHandler(isShow:Boolean) {
+
+        fun showingClockHandler(isShow: Boolean) {
             isShowClockHandler = isShow
         }
 
@@ -44,7 +41,7 @@ class ClockChartBase {
         }
 
 
-         fun log(log: String) {
+        fun log(log: String) {
             android.util.Log.e("clock", log)
         }
     }
